@@ -3,3 +3,9 @@
 @tailwind utilities;
 
 @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap');
+
+@layer components {
+    .button {
+        @apply flex items-center text-moderateBlue font-bold gap-2
+    }
+}
