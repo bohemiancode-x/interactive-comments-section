@@ -1,7 +1,11 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { isOpen } from '../redux/modalslice';
+import { isOpen, isNotOpen } from '../redux/modalslice';
+import { addReply } from "../redux/commentsSlice"
+import { deleteComment } from '../redux/commentsSlice';
 import PostComment from './PostComment';
+import Modal from "./Modal";
 import { useState } from "react";
+import { formatDistanceToNow } from "date-fns";
 
 //icons
 import plusicon from '../assets/images/icon-plus.svg';
@@ -14,15 +18,37 @@ export default function Comment({ com }) {
     const { currentUser } = useSelector((store) => store.comments)
     const dispatch = useDispatch();
     const [openReply, SetOpenReply] = useState(false);
+    const [reply, setReply] = useState('')
 
     const toggleReply = () => {
         SetOpenReply(!openReply)
+    };
+
+    const handleDelete = (id) => {
+        dispatch(deleteComment(id))
+        dispatch(isNotOpen());
+    }
+
+    const postReply = () => {   
+        const date = formatDistanceToNow(new Date(), {addSuffix: true}); 
+        const data = {
+            "cid": com.id,
+            "user": {...currentUser},
+            "content": reply,
+            "id": Math.random(),
+            "score": 0,
+            "replyingTo": com.user.username,
+            "createdAt": date,
+        };
+        {reply.length && dispatch(addReply(data))};
+        setReply('');
+        SetOpenReply(false);
     }
 
   return (
     <div>
         <div className='relative mb-1 flex flex-col-reverse md:flex-row gap-5 bg-white p-5 rounded-lg'>
-            <div className='bg-veryLightGray w-[30%] md:w-[15%] flex md:flex-col justify-around h-[inherit] p-2 items-center rounded'>
+            <div className='bg-veryLightGray w-[30%] md:w-[inherit] flex md:flex-col justify-around h-[inherit] p-2 px-3 items-center rounded'>
                 <button>
                     <img src={plusicon} alt="plus" />
                 </button>
@@ -37,8 +63,8 @@ export default function Comment({ com }) {
                     <img className='h-[30px]' src={com.user.image.png} alt="avatar" />
                     <h3 className='text-darkBlue font-bold'>{com.user.username}</h3>
                     {com.user.username === currentUser.username && <span className='bg-moderateBlue px-[2px] text-white text-sm'>you</span>}
-                    <p className='text-grayishBlue'>{com.createdAt}</p>
-                    <div className='absolute bottom-5 right-5 md:relative md:ml-auto'>
+                    <p className='text-grayishBlue text-sm'>{com.createdAt}</p>
+                    <div className='absolute bottom-5 right-5 md:bottom-1 md:right-0 md:relative md:ml-auto'>
                         {
                             com.user.username != currentUser.username && 
                             <button onClick={() => toggleReply(com.id)} className='button hover:opacity-50'>
@@ -48,7 +74,7 @@ export default function Comment({ com }) {
                         }
                         {
                             com.user.username === currentUser.username && 
-                            <div className='flex gap-4'>
+                            <div className='flex gap-4 ml-16'>
                                 <button onClick={() => dispatch(isOpen())} className='hover:opacity-50 button text-softRed'>
                                     <img src={deleteicon} alt="reply" />
                                     <p>Delete</p>
@@ -71,8 +97,8 @@ export default function Comment({ com }) {
                 </div>
             </div>
         </div>
-        {openReply && <PostComment btnText={'REPLY'} />}
-
+        {openReply && <PostComment comment={reply} setComment={setReply} func={postReply} btnText={'REPLY'} />}
+        <Modal func={handleDelete} comid={com.id} />
     </div>
   )
 }

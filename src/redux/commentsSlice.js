@@ -24,6 +24,22 @@ const commentsSlice = createSlice({
     reducers: {
         addComment: (state, action) => {
             state.comments = [...state.comments, action.payload]
+        },
+        deleteComment: (state, action) => {
+            const commentId = action.payload;
+            state.comments = state.comments.filter((comment) => comment.id !== commentId);
+        },
+        addReply: (state, action) => {
+            const newState = {...state}
+            const index = newState.comments.findIndex(f => f.id === action.payload.cid);
+            newState.comments[index].replies.push(action.payload);
+            state.comments = [...newState.comments]
+        },
+        deleteReply: (state, action) => {
+            const replyId = action.payload;
+            const newState = {...state}
+            const index = newState.comments.findIndex(f => f.id === action.payload.cid);
+            //state.comments = newState.comments[index].replies.filter
         }
     },
     extraReducers: {
@@ -41,6 +57,6 @@ const commentsSlice = createSlice({
     }
 })
 
-export const { addComment } = commentsSlice.actions;
+export const { addComment, deleteComment, addReply } = commentsSlice.actions;
 
 export default commentsSlice.reducer;

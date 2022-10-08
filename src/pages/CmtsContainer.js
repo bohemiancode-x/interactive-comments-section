@@ -31,7 +31,6 @@ export default function CmtsContainer() {
         {comments && comments.map((com) => (
             <>
             <Comment com={com} key={com.id} />
-            {/* {openReply && <PostComment btnText={'REPLY'} />} */}
             <div>
                 <div className="flex flex-col gap-3 w-[95%] ml-auto border-l-2 border-lightGray pl-8">
                     {com.replies.length > 0 && 
