@@ -6,6 +6,6 @@
 
 @layer components {
     .button {
-        @apply flex items-center text-moderateBlue font-bold gap-2
+        @apply flex items-center text-moderateBlue font-bold gap-1
     }
 }

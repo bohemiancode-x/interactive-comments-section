@@ -22,6 +22,12 @@ const commentsSlice = createSlice({
     name: 'comments',
     initialState,
     reducers: {
+        increaseScore: (state, action) => {
+            const newState = {...state}
+            const index = newState.comments.findIndex(f => f.id === action.payload);
+            newState.comments[index].score = newState.comments[index].score + 1;
+            //state.comments = [...newState.comments];
+        },
         addComment: (state, action) => {
             state.comments = [...state.comments, action.payload]
         },
@@ -36,12 +42,20 @@ const commentsSlice = createSlice({
             state.comments = [...newState.comments]
         },
         deleteReply: (state, action) => {
-            const replyId = action.payload;
+            const replyId = action.payload.rid;
             const newState = {...state}
             const index = newState.comments.findIndex(f => f.id === action.payload.cid);
-            //state.comments = newState.comments[index].replies.filter
-        }
-    },
+            const comment = newState.comments[index]
+            const updatedComment = {
+                ...comment,
+                replies: comment.replies.filter(reply => reply.id !== replyId)
+            };
+            state.comments = [
+                    ...newState.comments.slice(0, index),
+                    updatedComment,
+                    ...newState.comments.slice(index + 1)
+                ]}
+            },
     extraReducers: {
         [getComments.pending]: (state) => {
             state.isLoading = true;
@@ -57,6 +71,6 @@ const commentsSlice = createSlice({
     }
 })
 
-export const { addComment, deleteComment, addReply } = commentsSlice.actions;
+export const { addComment, deleteComment, addReply, deleteReply, increaseScore } = commentsSlice.actions;
 
 export default commentsSlice.reducer;

@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addComment } from "../redux/commentsSlice";
 import { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
+import Reply from "../components/Reply";
 
 export default function CmtsContainer() {
     const [comment, setComment] = useState('');
@@ -35,7 +36,7 @@ export default function CmtsContainer() {
                 <div className="flex flex-col gap-3 w-[95%] ml-auto border-l-2 border-lightGray pl-8">
                     {com.replies.length > 0 && 
                         com.replies.map((reply) => (
-                            <Comment key={reply.id} com={reply} />
+                            <Reply key={reply.id} rep={reply} com={com} />
                         ))
                     }
                 </div>

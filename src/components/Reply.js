@@ -1,9 +1,9 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { addReply, deleteComment, increaseScore } from "../redux/commentsSlice"
+import { addReply, deleteReply } from "../redux/commentsSlice";
 import { isOpen, isNotOpen } from '../redux/modalslice';
-import PostComment from './PostComment';
 import Modal from "./Modal";
 import { useState } from "react";
+import PostComment from './PostComment';
 import { formatDistanceToNow } from "date-fns";
 
 //icons
@@ -13,12 +13,16 @@ import replyicon from '../assets/images/icon-reply.svg';
 import deleteicon from '../assets/images/icon-delete.svg';
 import editicon from '../assets/images/icon-edit.svg';
 
-export default function Comment({ com }) {
+export default function Reply({ rep, com }) {
     const { currentUser } = useSelector((store) => store.comments)
     const dispatch = useDispatch();
     const [openReply, SetOpenReply] = useState(false);
-    const [modal, setModal] = useState(false);
     const [reply, setReply] = useState('')
+    const [modal, setModal] = useState(false);
+
+    const toggleReply = () => {
+        SetOpenReply(!openReply)
+    };
 
     const toggleModal = () => {
         if (modal) {
@@ -27,7 +31,7 @@ export default function Comment({ com }) {
             dispatch(isOpen())
         };
         setModal(!modal)
-    }
+    };
 
     const postReply = () => {   
         const date = formatDistanceToNow(new Date(), {addSuffix: true}); 
@@ -37,7 +41,7 @@ export default function Comment({ com }) {
             "content": reply,
             "id": Math.random(),
             "score": 0,
-            "replyingTo": com.user.username,
+            "replyingTo": rep.user.username,
             "createdAt": date,
         };
         {reply.length && dispatch(addReply(data))};
@@ -45,12 +49,14 @@ export default function Comment({ com }) {
         SetOpenReply(false);
     }
 
-    const toggleReply = () => {
-        SetOpenReply(!openReply)
+    const action = {
+        cid: com.id,
+        rid: rep.id
     };
 
     const handleDelete = () => {
-        dispatch(deleteComment(com.id))
+        dispatch(deleteReply(action));
+        dispatch(isNotOpen());
         setModal(false);
     }
 
@@ -62,7 +68,7 @@ export default function Comment({ com }) {
                 <button>
                     <img src={plusicon} alt="plus" />
                 </button>
-                <span className='font-bold text-moderateBlue'>{com.score}</span>
+                <span className='font-bold text-moderateBlue'>{rep.score}</span>
                 <button>
                     <img src={minusicon} alt="minus" />
                 </button>
@@ -70,21 +76,21 @@ export default function Comment({ com }) {
 
             <div>
                 <div className='flex gap-3 py-2 items-center'>
-                    <img className='h-[30px]' src={com.user.image.png} alt="avatar" />
-                    <h3 className='text-darkBlue font-bold'>{com.user.username}</h3>
-                    {com.user.username === currentUser.username && <span className='bg-moderateBlue px-[2px] text-white text-sm'>you</span>}
-                    <p className='text-grayishBlue text-sm'>{com.createdAt}</p>
+                    <img className='h-[30px]' src={rep.user.image.png} alt="avatar" />
+                    <h3 className='text-darkBlue font-bold'>{rep.user.username}</h3>
+                    {rep.user.username === currentUser.username && <span className='bg-moderateBlue px-[2px] text-white text-sm'>you</span>}
+                    <p className='text-grayishBlue text-sm'>{rep.createdAt}</p>
                     <div className='absolute bottom-5 right-5 md:bottom-1 md:right-0 md:relative md:ml-auto'>
                         {
-                            com.user.username !== currentUser.username && 
-                            <button onClick={() => toggleReply()} className='button hover:opacity-50'>
+                            rep.user.username !== currentUser.username && 
+                            <button onClick={() => toggleReply(rep.id)} className='button hover:opacity-50'>
                                 <img src={replyicon} alt="reply" />
                                 <p>Reply</p>
                             </button>
                         }
                         {
-                            com.user.username === currentUser.username && 
-                            <div className='flex gap-4 ml-16'>
+                            rep.user.username === currentUser.username && 
+                            <div className='flex gap-4 ml-2'>
                                 <button onClick={() => toggleModal()} className='hover:opacity-50 button text-softRed'>
                                     <img src={deleteicon} alt="reply" />
                                     <p>Delete</p>
@@ -99,16 +105,15 @@ export default function Comment({ com }) {
                     
                 </div>
 
-                <div>
-                    
+                <div>   
                     <p className='text-grayishBlue'>
-                    {com.replyingTo && <span className='font-bold text-moderateBlue mr-1'>@{com.replyingTo}</span>}{com.content}
+                    {rep.replyingTo && <span className='font-bold text-moderateBlue mr-1'>@{rep.replyingTo}</span>}{rep.content}
                     </p>
                 </div>
             </div>
         </div>
         {openReply && <PostComment comment={reply} setComment={setReply} func={postReply} btnText={'REPLY'} />}
-        <Modal func={handleDelete} modal={modal} toggleModal={toggleModal} />
+        <Modal modal={modal} toggleModal={toggleModal} func={handleDelete} />
     </div>
   )
 }
