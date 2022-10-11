@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { addReply, deleteReply } from "../redux/commentsSlice";
+import { addReply, deleteReply, addReplyScore, decReplyScore } from "../redux/commentsSlice";
 import { isOpen, isNotOpen } from '../redux/modalslice';
 import Modal from "./Modal";
 import { useState } from "react";
@@ -19,6 +19,8 @@ export default function Reply({ rep, com }) {
     const [openReply, SetOpenReply] = useState(false);
     const [reply, setReply] = useState('')
     const [modal, setModal] = useState(false);
+    const [incFired, setIncFired] = useState(false);
+    const [decFired, setDecFired] = useState(false);
 
     const toggleReply = () => {
         SetOpenReply(!openReply)
@@ -58,18 +60,35 @@ export default function Reply({ rep, com }) {
         dispatch(deleteReply(action));
         dispatch(isNotOpen());
         setModal(false);
-    }
+    };
+
+    const incScore = (id) => {
+        if (!incFired) {
+            dispatch(addReplyScore(id))
+        };
+        setIncFired(true);
+        setDecFired(false);
+    };
+    const decScore = (id) => {
+        if (incFired) {
+            if (!decFired) {
+                dispatch(decReplyScore(id))
+            };
+            setDecFired(true);
+            setIncFired(false); 
+        }
+    };
 
 
   return (
     <div>
         <div className='relative mb-1 flex flex-col-reverse md:flex-row gap-5 bg-white p-5 rounded-lg'>
             <div className='bg-veryLightGray w-[30%] md:w-[inherit] flex md:flex-col justify-around h-[inherit] p-2 px-3 items-center rounded'>
-                <button>
+                <button onClick={() => incScore(action)}>
                     <img src={plusicon} alt="plus" />
                 </button>
                 <span className='font-bold text-moderateBlue'>{rep.score}</span>
-                <button>
+                <button onClick={() => decScore(action)}>
                     <img src={minusicon} alt="minus" />
                 </button>
             </div>

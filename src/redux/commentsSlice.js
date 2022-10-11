@@ -25,8 +25,34 @@ const commentsSlice = createSlice({
         increaseScore: (state, action) => {
             const newState = {...state}
             const index = newState.comments.findIndex(f => f.id === action.payload);
-            newState.comments[index].score = newState.comments[index].score + 1;
-            //state.comments = [...newState.comments];
+            const newScore = newState.comments[index].score + 1;
+            const comment = newState.comments[index];
+            //console.log(newScore);
+            const updatedComment = {
+                ...comment,
+                score: newScore,
+            };
+            state.comments = [
+                ...newState.comments.slice(0, index),
+                updatedComment,
+                ...newState.comments.slice(index + 1)
+            ]
+        },
+        decreaseScore: (state, action) => {
+            const newState = {...state}
+            const index = newState.comments.findIndex(f => f.id === action.payload);
+            const newScore = newState.comments[index].score - 1;
+            const comment = newState.comments[index];
+            //console.log(newScore);
+            const updatedComment = {
+                ...comment,
+                score: newScore,
+            };
+            state.comments = [
+                ...newState.comments.slice(0, index),
+                updatedComment,
+                ...newState.comments.slice(index + 1)
+            ]
         },
         addComment: (state, action) => {
             state.comments = [...state.comments, action.payload]
@@ -54,8 +80,61 @@ const commentsSlice = createSlice({
                     ...newState.comments.slice(0, index),
                     updatedComment,
                     ...newState.comments.slice(index + 1)
-                ]}
-            },
+                ]
+        },
+        addReplyScore: (state, action) => {
+            const newState = {...state};
+            const commentIndex = newState.comments.findIndex(f => f.id === action.payload.cid);
+            const replyIndex = newState.comments[commentIndex].replies.findIndex(f => f.id === action.payload.rid);
+            const reply = newState.comments[commentIndex].replies[replyIndex];
+            const newScore = reply.score + 1;
+            const updatedReply = {
+                ...reply,
+                score: newScore,
+            };
+            const comment = newState.comments[commentIndex]
+            const updatedComment = {
+                ...comment,
+                replies: [
+                    ...comment.replies.slice(0, replyIndex),
+                    updatedReply,
+                    ...comment.replies.slice(replyIndex + 1)
+                ]
+            };
+            //console.log(updatedComment);
+            state.comments = [
+                ...newState.comments.slice(0, commentIndex),
+                updatedComment,
+                ...newState.comments.slice(commentIndex + 1)
+            ]
+        },
+        decReplyScore: (state, action) => {
+            const newState = {...state};
+            const commentIndex = newState.comments.findIndex(f => f.id === action.payload.cid);
+            const replyIndex = newState.comments[commentIndex].replies.findIndex(f => f.id === action.payload.rid);
+            const reply = newState.comments[commentIndex].replies[replyIndex];
+            const newScore = reply.score - 1;
+            const updatedReply = {
+                ...reply,
+                score: newScore,
+            };
+            const comment = newState.comments[commentIndex]
+            const updatedComment = {
+                ...comment,
+                replies: [
+                    ...comment.replies.slice(0, replyIndex),
+                    updatedReply,
+                    ...comment.replies.slice(replyIndex + 1)
+                ]
+            };
+            //console.log(updatedComment);
+            state.comments = [
+                ...newState.comments.slice(0, commentIndex),
+                updatedComment,
+                ...newState.comments.slice(commentIndex + 1)
+            ]
+        },
+        },
     extraReducers: {
         [getComments.pending]: (state) => {
             state.isLoading = true;
@@ -71,6 +150,6 @@ const commentsSlice = createSlice({
     }
 })
 
-export const { addComment, deleteComment, addReply, deleteReply, increaseScore } = commentsSlice.actions;
+export const { addComment, deleteComment, addReply, deleteReply, increaseScore, decreaseScore, addReplyScore, decReplyScore } = commentsSlice.actions;
 
 export default commentsSlice.reducer;

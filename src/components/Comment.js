@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { addReply, deleteComment, increaseScore } from "../redux/commentsSlice"
+import { addReply, deleteComment, increaseScore, decreaseScore } from "../redux/commentsSlice"
 import { isOpen, isNotOpen } from '../redux/modalslice';
 import PostComment from './PostComment';
 import Modal from "./Modal";
@@ -18,7 +18,9 @@ export default function Comment({ com }) {
     const dispatch = useDispatch();
     const [openReply, SetOpenReply] = useState(false);
     const [modal, setModal] = useState(false);
-    const [reply, setReply] = useState('')
+    const [reply, setReply] = useState('');
+    const [incFired, setIncFired] = useState(false);
+    const [decFired, setDecFired] = useState(false);
 
     const toggleModal = () => {
         if (modal) {
@@ -51,19 +53,36 @@ export default function Comment({ com }) {
 
     const handleDelete = () => {
         dispatch(deleteComment(com.id))
+        dispatch(isNotOpen());
         setModal(false);
-    }
+    };
+    const incScore = (id) => {
+        if (!incFired) {
+            dispatch(increaseScore(id))
+        };
+        setIncFired(true);
+        setDecFired(false);
+    };
+    const decScore = (id) => {
+        if (incFired) {
+            if (!decFired) {
+                dispatch(decreaseScore(id))
+            };
+            setDecFired(true);
+            setIncFired(false); 
+        }
+    };
 
 
   return (
     <div>
         <div className='relative mb-1 flex flex-col-reverse md:flex-row gap-5 bg-white p-5 rounded-lg'>
             <div className='bg-veryLightGray w-[30%] md:w-[inherit] flex md:flex-col justify-around h-[inherit] p-2 px-3 items-center rounded'>
-                <button>
+                <button onClick={() => incScore(com.id)}>
                     <img src={plusicon} alt="plus" />
                 </button>
                 <span className='font-bold text-moderateBlue'>{com.score}</span>
-                <button>
+                <button onClick={() => decScore(com.id)}>
                     <img src={minusicon} alt="minus" />
                 </button>
             </div>
