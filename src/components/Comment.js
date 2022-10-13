@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { addReply, deleteComment, increaseScore, decreaseScore } from "../redux/commentsSlice"
+import { addReply, deleteComment, increaseScore, decreaseScore, editComment } from "../redux/commentsSlice"
 import { isOpen, isNotOpen } from '../redux/modalslice';
 import PostComment from './PostComment';
 import Modal from "./Modal";
@@ -17,6 +17,8 @@ export default function Comment({ com }) {
     const { currentUser } = useSelector((store) => store.comments)
     const dispatch = useDispatch();
     const [openReply, SetOpenReply] = useState(false);
+    const [openEdit, setOpenEdit] = useState(false);
+    const [editedCom, setEditedCom] = useState(com.content);
     const [modal, setModal] = useState(false);
     const [reply, setReply] = useState('');
     const [incFired, setIncFired] = useState(false);
@@ -50,6 +52,9 @@ export default function Comment({ com }) {
     const toggleReply = () => {
         SetOpenReply(!openReply)
     };
+    const toggleEdit = () => {
+        setOpenEdit(!openEdit)
+    };
 
     const handleDelete = () => {
         dispatch(deleteComment(com.id))
@@ -72,6 +77,14 @@ export default function Comment({ com }) {
             setIncFired(false); 
         }
     };
+    const editCom = () => {
+        const action = {
+            cid: com.id,
+            newComment: editedCom
+        }
+        dispatch(editComment(action));
+        setOpenEdit(false);
+    }
 
 
   return (
@@ -108,7 +121,7 @@ export default function Comment({ com }) {
                                     <img src={deleteicon} alt="reply" />
                                     <p>Delete</p>
                                 </button>
-                                <button className='button hover:opacity-50'>
+                                <button onClick={() => toggleEdit()} className='button hover:opacity-50'>
                                     <img src={editicon} alt="reply" />
                                     <p>Edit</p>
                                 </button>
@@ -119,10 +132,19 @@ export default function Comment({ com }) {
                 </div>
 
                 <div>
+                    {!openEdit ? 
+                        <p className='text-grayishBlue'>
+                        {com.replyingTo && <span className='font-bold text-moderateBlue mr-1'>@{com.replyingTo}</span>}{com.content}
+                        </p> :
+                        <div>
+                        {com.user.username === currentUser.username && 
+                            <div className='flex flex-col gap-3'>
+                                <textarea onChange={(e) => setEditedCom(e.target.value)} className='w-full border-2 border-lightGray rounded h-[60%] md:h-[80%] md:mx-2 p-2' value={editedCom} />
+                                <button onClick={() => editCom()} className='ml-auto bg-moderateBlue text-white p-2 rounded md:h-[30%] text-sm px-5 hover:opacity-50'>UPDATE</button>
+                            </div>}
+                        </div>
+                    } 
                     
-                    <p className='text-grayishBlue'>
-                    {com.replyingTo && <span className='font-bold text-moderateBlue mr-1'>@{com.replyingTo}</span>}{com.content}
-                    </p>
                 </div>
             </div>
         </div>

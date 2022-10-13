@@ -10,7 +10,7 @@ export default function PostComment({ comment, func, btnText, setComment }) {
           className='w-full border-2 border-lightGray rounded md:w-[80%] h-[60%] md:h-[80%] md:mx-2 p-2' placeholder='Add a comment..' />
         <button
           onClick={() => func()} 
-          className='absolute bottom-5 right-5 md:relative bg-moderateBlue text-white p-2 rounded md:h-[30%] text-sm px-5 hover:opacity-50'>
+          className='absolute bottom-5 right-5 md:relative bg-moderateBlue text-white p-2 rounded md:h-[40%] text-sm px-5 hover:opacity-50'>
             {btnText}
           </button>
     </div>

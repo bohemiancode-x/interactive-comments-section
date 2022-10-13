@@ -22,6 +22,46 @@ const commentsSlice = createSlice({
     name: 'comments',
     initialState,
     reducers: {
+        editComment: (state, action) => {
+            const newState = {...state};
+            const index = newState.comments.findIndex(f => f.id === action.payload.cid);
+            const comment = newState.comments[index];
+            const newComment = action.payload.newComment;
+            const updatedComment = {
+                ...comment,
+                content: newComment,
+            };
+            state.comments = [
+                ...newState.comments.slice(0, index),
+                updatedComment,
+                ...newState.comments.slice(index + 1)
+            ]
+        },
+        editReply: (state, action) => {
+            const newState = {...state};
+            const commentIndex = newState.comments.findIndex(f => f.id === action.payload.cid);
+            const comment = newState.comments[commentIndex];
+            const replyIndex = comment.replies.findIndex(f => f.id === action.payload.rid);
+            const reply = comment.replies[replyIndex];
+            const newReply = action.payload.newReply;
+            const updatedReply = {
+                ...reply,
+                content: newReply,
+            };
+            const updatedComment = {
+                ...comment,
+                replies: [
+                    ...comment.replies.slice(0, replyIndex),
+                    updatedReply,
+                    ...comment.replies.slice(replyIndex + 1)
+                ]
+            };
+            state.comments = [
+                ...newState.comments.slice(0, commentIndex),
+                updatedComment,
+                ...newState.comments.slice(commentIndex + 1)
+            ]
+        },
         increaseScore: (state, action) => {
             const newState = {...state}
             const index = newState.comments.findIndex(f => f.id === action.payload);
@@ -150,6 +190,6 @@ const commentsSlice = createSlice({
     }
 })
 
-export const { addComment, deleteComment, addReply, deleteReply, increaseScore, decreaseScore, addReplyScore, decReplyScore } = commentsSlice.actions;
+export const { addComment, deleteComment, addReply, deleteReply, increaseScore, decreaseScore, addReplyScore, decReplyScore, editComment, editReply } = commentsSlice.actions;
 
 export default commentsSlice.reducer;
