@@ -111,19 +111,19 @@ export default function Comment({ com }) {
                             com.user.username !== currentUser.username && 
                             <button onClick={() => toggleReply()} className='button hover:opacity-50'>
                                 <img src={replyicon} alt="reply" />
-                                <p>Reply</p>
+                                Reply
                             </button>
                         }
                         {
                             com.user.username === currentUser.username && 
                             <div className='flex gap-4 ml-16'>
                                 <button onClick={() => toggleModal()} className='hover:opacity-50 button text-softRed'>
-                                    <img src={deleteicon} alt="reply" />
-                                    <p>Delete</p>
+                                    <img src={deleteicon} alt="delete" />
+                                    Delete
                                 </button>
                                 <button onClick={() => toggleEdit()} className='button hover:opacity-50'>
-                                    <img src={editicon} alt="reply" />
-                                    <p>Edit</p>
+                                    <img src={editicon} alt="edit" />
+                                    Edit
                                 </button>
                             </div>
                         }
